@@ -1,0 +1,216 @@
+<% layout('layout/page'); %>
+
+<% block('title', 'Costumers page'); %>
+
+<div class="notify" style="max-width: 400px; margin: 0 auto; margin-bottom: 20px;"></div>
+<ul id="costumers" class="list-group" style="max-width: 400px; margin: 0 auto;">
+</ul>
+
+<div class="modal fade" id="orders" tabindex="-1" role="dialog" aria-labelledby="orders">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Заказы конкретного пользователя</h4>
+            </div>
+            <div class="modal-body">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function ($) {
+        var costumers = <%- costumers %>;
+        var length = costumers.length;
+        var element = $('#costumers');
+        
+        while(length) {
+            var html = '<li class="list-group-item">' +
+                '<button data-costumer="' +
+                costumers[length-1].CostumerId +
+                '" class="order-list btn btn-default badge" type="button">' +
+                'Показать заказы' +
+                '</button>' +
+                costumers[length-1].CostumerId +
+                ') ' +
+                costumers[length-1].Name +
+                ' (Телефон: ' +
+                costumers[length-1].Phone +
+                ')' +
+                '</li>';
+
+            element.append(html);
+            length--;
+        }
+        
+        var form = $('#add-product').find('form');
+        form.submit(function(event) {
+            event.preventDefault();
+            form.find('button').prop('disabled', true);
+            
+            var name = form.find('#inputProductName').val();
+            var price = Number(form.find('#inputProductPrice').val());
+            var count = Number(form.find('#inputProductCount').val());
+
+            var data = {
+                name: name,
+                price: price,
+                count: count
+            };
+            
+            $.ajax({
+                type: "POST",
+                url: '//127.0.0.1:3000/products',
+                // headers: { 'Access-Control-Allow-Origin': '*' },
+                dataType: 'json',
+                data: JSON.stringify(data)
+            }).done(function(data, textStatus, jqXHR) {
+                $('#add-product').modal('hide')
+                form.find('button').prop('disabled', false);
+                $('.notify').append('<div class="alert alert-success" role="alert">Продукт успешно добавлен! Перейдите на <a href="//localhost:3000/products">страницу продуктов</a> чтобы увидеть его.</div>');
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                $('#add-product').modal('hide')
+                form.find('button').prop('disabled', false);
+
+                if (jqXHR.status === 200) {
+                    $('.notify').append('<div class="alert alert-success" role="alert">Продукт успешно добавлен! Перейдите на <a href="//localhost:3000/products">страницу продуктов</a> чтобы увидеть его.</div>');
+                } else {
+                    $('.notify').append('<div class="alert alert-danger" role="alert">Продукт не добавлен! Повторите попытку позже.</div>');
+                }
+            });
+        });
+        
+        var form1 = $('#add-costumer').find('form');
+        form1.submit(function(event) {
+            event.preventDefault();
+            form1.find('button').prop('disabled', true);
+            
+            var name = form1.find('#inputСostumerName').val();
+            var phone = Number(form1.find('#inputСostumerPhone').val());
+
+            console.log(name);
+            console.log(phone);
+
+            var data = {
+                name: name,
+                phone: phone
+            };
+            
+            $.ajax({
+                type: "POST",
+                url: '//localhost:3000/costumers',
+                dataType: 'json',
+                data: JSON.stringify(data)
+            }).done(function(data, textStatus, jqXHR) {
+                $('#add-costumer').modal('hide')
+                form1.find('button').prop('disabled', false);
+                $('.notify').append('<div class="alert alert-success" role="alert">Покупатель успешно добавлен! Обновите страницу чтобы увидеть его.</div>');
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                $('#add-costumer').modal('hide')
+                form1.find('button').prop('disabled', false);
+
+                if (jqXHR.status === 200) {
+                    $('.notify').append('<div class="alert alert-success" role="alert">Покупатель успешно добавлен! Обновите страницу чтобы увидеть его.</div>');
+                } else {
+                    $('.notify').append('<div class="alert alert-danger" role="alert">Покупатель не добавлен! Повторите попытку позже.</div>');
+                }
+            });
+        });
+        
+        var form2 = $('#add-order').find('form');
+        form2.submit(function(event) {
+            event.preventDefault();
+            form2.find('button').prop('disabled', true);
+            
+            var name = form2.find('#inputOrderName').val();
+            var costumer_id = Number(form2.find('#inputOrderCostumerId').val());
+            var product_id = form2.find('#inputOrderProductId').val();
+            var count = Number(form2.find('#inputOrderCount').val());
+
+            var data = {
+                name: name,
+                costumer_id: costumer_id,
+                product_id: product_id,
+                count: count
+            };
+            
+            $.ajax({
+                type: "POST",
+                url: '//localhost:3000/orders',
+                dataType: 'json',
+                data: JSON.stringify(data)
+            }).done(function(data, textStatus, jqXHR) {
+                $('#add-order').modal('hide')
+                form2.find('button').prop('disabled', false);
+                $('.notify').append('<div class="alert alert-success" role="alert">Заказ успешно добавлен! Обновите страницу чтобы увидеть его.</div>');
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                $('#add-order').modal('hide')
+                form2.find('button').prop('disabled', false);
+
+                console.log(jqXHR);
+                console.log(textStatus);
+                console.log(errorThrown);
+
+                if (jqXHR.status === 200) {
+                    $('.notify').append('<div class="alert alert-success" role="alert">Заказ успешно добавлен! Обновите страницу чтобы увидеть его.</div>');
+                } else {
+                    $('.notify').append('<div class="alert alert-danger" role="alert">Покупатель не добавлен! Повторите попытку позже.</div>');
+                }
+            });
+        });
+        
+        $('.order-list').on('click', function(event) {
+            event.preventDefault();
+            var modal = $('#orders');
+            var modalContent = modal.find('.modal-body');
+            var costumer_id = Number($(this).attr('data-costumer'));
+
+            $.ajax({
+                type: "GET",
+                url: '//localhost:3000/orders/' + costumer_id,
+                // dataType: 'json',
+                // data: JSON.stringify(data)
+            }).done(function(data, textStatus, jqXHR) {
+                var orders = data;
+                var html = '';
+
+                if (data.length) {
+                    html = 
+                        '<div class="table-responsive">' +
+                            '<table class="table">' +
+                                '<thead>' +
+                                    '<tr>' +
+                                        '<th>Заказ</th>' +
+                                        '<th>Продукт</th>' +
+                                        '<th>Количество</th>' +
+                                        '<th>Статус заказа</th>' +
+                                    '</tr>' +
+                                '</thead>' +
+                                '<tbody>';
+                    
+                    for (key in orders) {
+                        html +=
+                            '<tr>' +
+                                '<td>' + orders[key].OrderName + '</td>' +
+                                '<td>' + orders[key].ProductName + '</td>' +
+                                '<td>' + orders[key].Count + '</td>' +
+                                '<td>' + orders[key].OrderStatus + '</td>' +
+                            '</tr>';
+                    }
+                    
+                    html += '</tbody></table></div>';
+                } else {
+                    html += 'У покупателя нет заказов.';
+                }
+
+                modalContent.empty().append(html);
+                modal.modal('show')
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                console.log(textStatus);
+                console.log(errorThrown);
+            });
+        });
+    }(jQuery));
+</script>

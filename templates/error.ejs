@@ -1,0 +1,12 @@
+<% layout('layout/page'); %>
+
+<% block('title', errorNumber + '—' + errorName); %>
+
+<% block('heading', errorNumber); %>
+<% block('subheading', errorName); %>
+
+<p>
+    <b>Details:</b>
+    <br>
+    <%- error %>
+</p>

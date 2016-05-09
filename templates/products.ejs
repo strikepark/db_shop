@@ -1,0 +1,106 @@
+<% layout('layout/page'); %>
+
+<% block('title', 'Products page'); %>
+
+<div class="notify" style="max-width: 400px; margin: 0 auto; margin-bottom: 20px;"></div>
+<ul id="products" class="list-group" style="max-width: 400px; margin: 0 auto;">
+</ul>
+
+<script>
+    (function ($) {
+        var products = <%- products %>;
+        var length = products.length;
+        var element = $('#products');
+        
+        while(length) {
+            var html = '<li class="list-group-item">' +
+                '<span class="badge">' +
+                products[length-1].Count +
+                '</span>' +
+                products[length-1].ProductId +
+                ') ' +
+                products[length-1].Name +
+                ' / ' +
+                products[length-1].Price +
+                '₽' +
+                '</li>';
+
+            element.append(html);
+            length--;
+        }
+        
+        var form = $('#add-product').find('form');
+        form.submit(function(event) {
+            event.preventDefault();
+            form.find('button').prop('disabled', true);
+            
+            var name = form.find('#inputProductName').val();
+            var price = Number(form.find('#inputProductPrice').val());
+            var count = Number(form.find('#inputProductCount').val());
+
+            var data = {
+                name: name,
+                price: price,
+                count: count
+            };
+            
+            $.ajax({
+                type: "POST",
+                url: '//127.0.0.1:3000/products',
+                // headers: { 'Access-Control-Allow-Origin': '*' },
+                dataType: 'json',
+                data: JSON.stringify(data)
+            }).done(function(data, textStatus, jqXHR) {
+                $('#add-product').modal('hide')
+                form.find('button').prop('disabled', false);
+                $('.notify').append('<div class="alert alert-success" role="alert">Продукт успешно добавлен! Обновите страницу чтобы увидеть его.</div>');
+            }).fail(function(jqXHR, textStatus, errorThrown ) {
+                $('#add-product').modal('hide')
+                form.find('button').prop('disabled', false);
+
+                if (jqXHR.status === 200) {
+                    $('.notify').append('<div class="alert alert-success" role="alert">Продукт успешно добавлен! Обновите страницу чтобы увидеть его.</div>');
+                } else {
+                    $('.notify').append('<div class="alert alert-danger" role="alert">Продукт не добавлен! Повторите попытку позже.</div>');
+                }
+            });
+        });
+        
+        var form1 = $('#add-costumer').find('form');
+        form1.submit(function(event) {
+            event.preventDefault();
+            form1.find('button').prop('disabled', true);
+            
+            var name = form1.find('#inputСostumerName').val();
+            var phone = Number(form1.find('#inputСostumerPhone').val());
+
+            console.log(name);
+            console.log(phone);
+
+            var data = {
+                name: name,
+                phone: phone
+            };
+            
+            $.ajax({
+                type: "POST",
+                url: '//localhost:3000/costumers',
+                dataType: 'json',
+                data: JSON.stringify(data)
+            }).done(function(data, textStatus, jqXHR) {
+                $('#add-costumer').modal('hide')
+                form.find('button').prop('disabled', false);
+                $('.notify').append('<div class="alert alert-success" role="alert">Покупатель успешно добавлен! Перейдите на <a href="//localhost:3000/costumers">страницу покупателей</a> чтобы увидеть его.</div>');
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                $('#add-costumer').modal('hide')
+                form.find('button').prop('disabled', false);
+
+                if (jqXHR.status === 200) {
+                    $('.notify').append('<div class="alert alert-success" role="alert">Покупатель успешно добавлен! Перейдите на <a href="//localhost:3000/costumers">страницу покупателей</a> чтобы увидеть его.</div>');
+                } else {
+                    $('.notify').append('<div class="alert alert-danger" role="alert">Покупатель не добавлен! Повторите попытку позже.</div>');
+                }
+            });
+        });
+    }(jQuery));
+</script>

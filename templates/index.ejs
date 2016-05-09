@@ -1,0 +1,17 @@
+<% layout('layout/page'); %>
+
+<% block('title', 'Index page'); %>
+
+<ul id="products" class="list-group"></ul>
+
+<script>
+    (function ($) {
+        var products = <%= products %>;
+        var length = products.length;
+        var element = $('#products');
+        
+        while(lentgth--) {
+            element.append('<li>' + products[length].Name + '</li>');
+        }
+    }(jQuery));
+</script>
